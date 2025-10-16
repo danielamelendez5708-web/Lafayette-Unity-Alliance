@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lafayette Unity Alliance - Inquiry & Action Portal</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /*
+         * METALLIC GREEN BACKGROUND STYLING WITH CHECKERED PATTERN
+         */
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #e2e8f0; /* Light text for high contrast on dark background */
+            
+            /* Metallic Gradient and subtle Checkered Pattern */
+            background-color: #173d28; /* Fallback color */
+            background-image: 
+                /* Subtle Dark Checkered Pattern */
+                repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.06) 0, rgba(0, 0, 0, 0.06) 1px, transparent 1px, transparent 10px),
+                /* Metallic Green Gradient Base */
+                linear-gradient(135deg, #1f4f34 0%, #296b42 40%, #1e5a32 60%, #173d28 100%);
+            background-size: 10px 10px, cover;
+            background-attachment: fixed;
+        }
+
+        /*
+         * ORNATE FRAME STYLING (SIMULATING FLORAL BORDER)
+         */
+        .app-border-frame {
+            /* Uses layered box shadows to create a thick, ornate, multi-colored border */
+            box-shadow: 
+                0 0 0 10px #7a9c84,    /* Inner Moss Green Layer */
+                0 0 0 15px #a87932,    /* Mid Bronze/Gold Layer (Ornate Feel) */
+                0 0 0 20px #153c29;    /* Outer Dark Green Layer */
+            padding: 24px; /* Space between the frame and the content */
+            border-radius: 2rem;
+            position: relative;
+            background: transparent; /* Allows body background to show through frame padding */
+            margin-bottom: 24px;
+        }
+
+
+        /*
+         * BACKGROUND DECORATIVE ANIMATION (SHIMMER & SPARKLE)
+         */
+        body::before {
+            content: '';
+            position: fixed; 
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            /* Lighter, brighter radial gradient for a more aggressive shimmer/shine */
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+            /* Combine rotation (backgroundShift) and a subtle flicker (pulseFlicker) */
+            animation: backgroundShift 15s linear infinite, pulseFlicker 1.5s infinite alternate;
+            opacity: 1; 
+            pointer-events: none; 
+            z-index: -1; 
+        }
+
+        @keyframes backgroundShift {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseFlicker {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        /*
+         * GENERAL UI STYLING
+         */
+        .section-card {
+            background-color: white; /* Keep content readable */
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .program-item {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .program-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(27, 86, 219, 0.1);
+        }
+        input:focus, textarea:focus, button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+        }
+        .scroll-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 0.5rem;
+        }
+        /* Floating Donate Button */
+        .donate-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        .vibrant-header {
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(160, 245, 172, 0.2);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- The main application content is wrapped in the decorative frame container -->
+    <div class="max-w-4xl mx-auto space-y-8 app-border-frame"> 
+
+        <!-- Floating Donate Button - CORRECTED URL -->
+        <a href="https://www.zeffy.com/en-US/donation-form/help-lafayette-estates-residents-fight-unjust-development" 
+           target="_blank" 
+           class="donate-fab bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 flex items-center transform active:scale-95">
+            <span class="text-xl mr-2">❤️</span>
+            Donate Now
+        </a>
+
+        <!-- Header and Mission Section (Color adjusted to dark green) -->
+        <header class="text-center py-10 bg-[#153c29] text-white rounded-xl shadow-xl">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-2 vibrant-header">Lafayette Unity Alliance</h1>
+            <p class="text-xl font-light max-w-2xl mx-auto">
+                Empowering Working-Class New Yorkers to stand against big money interests and champion their rights.
+            </p>
+            <p class="text-xs mt-4 opacity-75">
+                Current User ID: <span id="userIdDisplay" class="font-mono bg-[#112d20] px-1 py-0.5 rounded text-xs">...</span>
+            </p>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- 1. Inquiry Form (Contact) - UPDATED ICON -->
+            <section class="lg:col-span-2 section-card">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2 flex items-center">
+                    <span class="mr-2 text-2xl">📧</span>
+                    Send Us an Inquiry
+                </h2>
+                <form id="inquiryForm" class="space-y-4 mb-6">
+                    <div>
+                        <label for="inquiryName" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                        <input type="text" id="inquiryName" required
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700">
+                    </div>
+                    <div>
+                        <label for="inquiryEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input type="email" id="inquiryEmail" required
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700">
+                    </div>
+                    <div>
+                        <label for="inquiryMessage" class="block text-sm font-medium text-gray-700 mb-1">Your Message or Question</label>
+                        <textarea id="inquiryMessage" rows="4" required
+                                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700"></textarea>
+                    </div>
+                    <button type="submit" id="submitBtn"
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md active:scale-95 disabled:opacity-50">
+                        Submit Inquiry
+                    </button>
+                    <div id="formMessage" class="text-center mt-3 text-sm hidden"></div>
+                </form>
+                
+                <!-- Get Involved / Directory Button -->
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSc1MGtzIdxMzDecsggI40acfEGU7JUsKphc2ZIRe0KpYEFDkQ/viewform?pli=1&authuser=0" 
+                   target="_blank" 
+                   class="w-full block text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 rounded-lg transition duration-200 shadow-sm active:scale-95">
+                    <span class="text-xl mr-2">🤝</span>
+                    Visit Directory / Get Involved Form
+                </a>
+
+            </section>
+
+            <!-- 2. Programs/Resources Section - UPDATED ICON -->
+            <section class="section-card">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2 flex items-center">
+                    <span class="mr-2 text-2xl">🎯</span>
+                    Our Focus
+                </h2>
+                <div class="space-y-3">
+                    <div class="program-item p-3 border border-green-300 rounded-lg bg-green-50 text-gray-800 font-medium hover:shadow-green-300">👵 Senior Rights Advocacy</div>
+                    <div class="program-item p-3 border border-green-300 rounded-lg bg-green-50 text-gray-800 font-medium hover:shadow-green-300">📄 Tenants' Rights Education</div>
+                    <div class="program-item p-3 border border-green-300 rounded-lg bg-green-50 text-gray-800 font-medium hover:shadow-green-300">🏢 Co-op Shareholders' Rights</div>
+                    <div class="program-item p-3 border border-green-300 rounded-lg bg-green-50 text-gray-800 font-medium hover:shadow-green-300">🛠️ Legal Aid & Resources</div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Real-Time Public Inquiry Feed (Demonstration) - UPDATED ICON -->
+        <section class="section-card">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 flex items-center">
+                <span class="mr-2 text-2xl">💬</span>
+                Recent Community Inquiries (Live Feed)
+            </h2>
+            <p class="text-sm text-gray-500 mb-4">
+                This shows the last 5 messages submitted by visitors in real-time.
+            </p>
+            <div id="inquiriesFeed" class="scroll-container bg-gray-50 border border-gray-200 p-4 space-y-4">
+                <p class="text-center text-gray-500 italic" id="feedLoading">Loading recent inquiries...</p>
+            </div>
+        </section>
+
+    </div>
+
+<!-- Firebase Setup Scripts -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, addDoc, onSnapshot, collection, query, limit, orderBy, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    
+    // Set Firestore log level for debugging
+    setLogLevel('error');
+
+    // --- Global Configuration ---
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+    // --- Firebase Initialization ---
+    let app, db, auth, userId = null;
+
+    if (Object.keys(firebaseConfig).length > 0) {
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            document.getElementById('feedLoading').textContent = 'Error initializing database.';
+        }
+    } else {
+        console.error("Firebase configuration is missing.");
+        document.getElementById('feedLoading').textContent = 'Error: Database configuration is missing.';
+    }
+
+    // Function to handle user authentication
+    async function authenticateUser() {
+        if (!auth) return;
+
+        try {
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth);
+            }
+        } catch (error) {
+            console.error("Authentication failed:", error);
+        }
+    }
+
+    // Reference to the public inquiries collection
+    const getInquiriesCollectionRef = () => {
+        // Path: /artifacts/{appId}/public/data/inquiries
+        return collection(db, 'artifacts', appId, 'public', 'data', 'inquiries');
+    }
+
+    // --- Core Application Logic ---
+
+    // Wait for authentication state to be ready
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            userId = user.uid;
+            document.getElementById('userIdDisplay').textContent = userId;
+            setupEventListeners();
+            subscribeToInquiries();
+        } else if (auth && !userId) {
+            authenticateUser();
+        }
+    });
+
+    /**
+     * Subscribes to the public inquiries collection for a real-time feed.
+     */
+    function subscribeToInquiries() {
+        if (!db) return;
+
+        const inquiriesRef = getInquiriesCollectionRef();
+        // Query to get the 5 most recent inquiries, sorted by timestamp (newest first).
+        const q = query(inquiriesRef, orderBy('timestamp', 'desc'), limit(5));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const inquiries = [];
+            snapshot.forEach((doc) => {
+                inquiries.push(doc.data());
+            });
+            renderInquiries(inquiries);
+        }, (error) => {
+            console.error("Error subscribing to inquiries:", error);
+            document.getElementById('feedLoading').textContent = 'Failed to load live feed.';
+        });
+        
+        return unsubscribe;
+    }
+
+    /**
+     * Renders the real-time list of inquiries to the DOM.
+     * @param {Array<Object>} inquiries - Array of inquiry objects.
+     */
+    function renderInquiries(inquiries) {
+        const inquiriesFeed = document.getElementById('inquiriesFeed');
+        inquiriesFeed.innerHTML = ''; // Clear existing list
+
+        if (inquiries.length === 0) {
+            inquiriesFeed.innerHTML = '<p class="text-center text-gray-500 py-4 italic">No inquiries have been submitted yet.</p>';
+            return;
+        }
+
+        inquiries.forEach(inquiry => {
+            // Check if timestamp exists before converting to date
+            const time = inquiry.timestamp && inquiry.timestamp.toDate ? new Date(inquiry.timestamp.toDate()).toLocaleString() : 'Just now';
+            
+            const inquiryElement = document.createElement('div');
+            inquiryElement.className = 'border-b border-gray-200 pb-3 last:border-b-0';
+            
+            inquiryElement.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <p class="font-semibold text-indigo-700">${inquiry.name}</p>
+                    <span class="text-xs text-gray-500 ml-2">${time}</span>
+                </div>
+                <p class="text-sm text-gray-800 mt-1 break-words">${inquiry.message}</p>
+            `;
+            
+            inquiriesFeed.appendChild(inquiryElement);
+        });
+    }
+
+    /**
+     * Sets up event listeners for form submission.
+     */
+    function setupEventListeners() {
+        if (!db) return;
+
+        const form = document.getElementById('inquiryForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const formMessage = document.getElementById('formMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('inquiryName').value.trim();
+            const email = document.getElementById('inquiryEmail').value.trim();
+            const message = document.getElementById('inquiryMessage').value.trim();
+
+            if (!name || !email || !message) {
+                formMessage.classList.remove('hidden');
+                formMessage.className = 'text-sm text-red-600 mt-3 text-center';
+                formMessage.textContent = 'Please fill out all fields.';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            formMessage.classList.add('hidden');
+
+            try {
+                await addDoc(getInquiriesCollectionRef(), {
+                    name: name,
+                    email: email,
+                    message: message,
+                    timestamp: serverTimestamp()
+                });
+
+                formMessage.classList.remove('hidden');
+                formMessage.className = 'text-sm text-green-600 mt-3 text-center';
+                formMessage.textContent = 'Thank you! Your inquiry has been sent.';
+                
+                // Clear the form fields
+                form.reset(); 
+
+            } catch (e) {
+                console.error("Error submitting inquiry: ", e);
+                formMessage.classList.remove('hidden');
+                formMessage.className = 'text-sm text-red-600 mt-3 text-center';
+                formMessage.textContent = 'Submission failed. Please try again.';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Inquiry';
+            }
+        });
+    }
+
+    // Initial check for authentication status
+    if (auth && !userId) {
+        authenticateUser();
+    }
+</script>
+
+</body>
+</html>
+
+
